@@ -16,7 +16,7 @@ export const translations = {
     lightMode: "Light Mode",
     
     // Home Page
-    heroTitle: "AI-Powered Fruit Cultivation",
+    heroTitle: "Fruit Vision AI",
     heroSubtitle: "Smart agricultural solutions for Karnataka's fruit growers with disease detection and weather insights",
     getStarted: "Get Started",
     learnMore: "Learn More",
@@ -71,7 +71,7 @@ export const translations = {
     lightMode: "ಲೈಟ್ ಮೋಡ್",
     
     // Home Page
-    heroTitle: "AI-ಚಾಲಿತ ಹಣ್ಣಿನ ಕೃಷಿ",
+    heroTitle: "Fruit Vision AI",
     heroSubtitle: "ರೋಗ ಪತ್ತೆ ಮತ್ತು ಹವಾಮಾನ ಒಳನೋಟಗಳೊಂದಿಗೆ ಕರ್ನಾಟಕದ ಹಣ್ಣಿನ ರೈತರಿಗೆ ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಪರಿಹಾರಗಳು",
     getStarted: "ಪ್ರಾರಂಭಿಸಿ",
     learnMore: "ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ",
@@ -126,7 +126,7 @@ export const translations = {
     lightMode: "लाइट मोड",
     
     // Home Page
-    heroTitle: "AI-संचालित फल खेती",
+    heroTitle: "Fruit Vision AI",
     heroSubtitle: "रोग पहचान और मौसम अंतर्दृष्टि के साथ कर्नाटक के फल उत्पादकों के लिए स्मार्ट कृषि समाधान",
     getStarted: "शुरू करें",
     learnMore: "और जानें",
@@ -181,7 +181,7 @@ export const translations = {
     lightMode: "లైట్ మోడ్",
     
     // Home Page
-    heroTitle: "AI-ఆధారిత పండ్ల సాగు",
+    heroTitle: "Fruit Vision AI",
     heroSubtitle: "వ్యాధి గుర్తింపు మరియు వాతావరణ అంతర్దృష్టులతో కర్ణాటక పండ్ల రైతులకు స్మార్ట్ వ్యవసాయ పరిష్కారాలు",
     getStarted: "ప్రారంభించండి",
     learnMore: "మరింత తెలుసుకోండి",
