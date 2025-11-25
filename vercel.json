@@ -1,57 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/((?!api).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/detection",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/dashboard",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/prices",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/schemes",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/services",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
-      ]
-    }
-  ],
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite"
+  ]
 }
