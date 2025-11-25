@@ -333,6 +333,12 @@ const DiseaseDetection = () => {
             "Try a different angle or closer shot",
             "Ensure good lighting",
             "Focus on the affected area"
+          ],
+          prevention: [
+            "Use high-quality images",
+            "Ensure proper lighting",
+            "Focus on the fruit clearly",
+            "Try different angles if needed"
           ]
         });
       }
@@ -347,6 +353,12 @@ const DiseaseDetection = () => {
           "Please try again with a clearer image",
           "Ensure good lighting and focus",
           "Contact support if the issue persists"
+        ],
+        prevention: [
+          "Check your internet connection",
+          "Try uploading a different image",
+          "Ensure the image format is supported",
+          "Contact support if issues persist"
         ]
       });
     }
@@ -471,7 +483,7 @@ const DiseaseDetection = () => {
 
                   {/* Simple Treatment & Prevention */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {result.treatment && result.treatment.length > 0 && (
+                    {result.treatment && Array.isArray(result.treatment) && result.treatment.length > 0 && (
                       <div className="border rounded-lg p-4">
                         <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-red-600">
                           🏥 Treatment
@@ -487,22 +499,24 @@ const DiseaseDetection = () => {
                       </div>
                     )}
                     
-                    <div className="border rounded-lg p-4">
-                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-green-600">
-                        🛡️ Prevention Tips
-                      </h3>
-                      <ul className="space-y-2">
-                        {result.prevention.map((tip: string, index: number) => (
-                          <li key={index} className="flex gap-2">
-                            <span className="text-green-500 font-bold">•</span>
-                            <span className="text-sm">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {result.prevention && Array.isArray(result.prevention) && result.prevention.length > 0 && (
+                      <div className="border rounded-lg p-4">
+                        <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-green-600">
+                          🛡️ Prevention Tips
+                        </h3>
+                        <ul className="space-y-2">
+                          {result.prevention.map((tip: string, index: number) => (
+                            <li key={index} className="flex gap-2">
+                              <span className="text-green-500 font-bold">•</span>
+                              <span className="text-sm">{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
 
-                  {(!result.treatment || result.treatment.length === 0) && (
+                  {(!result.treatment || !Array.isArray(result.treatment) || result.treatment.length === 0) && (
                     <div className="text-center p-6 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200">
                       <AlertCircle className="h-12 w-12 mx-auto text-yellow-600 mb-3" />
                       <p className="text-lg font-medium text-yellow-800 dark:text-yellow-300 mb-2">
