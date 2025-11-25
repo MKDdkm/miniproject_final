@@ -4,10 +4,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import QuickActionCard from "@/components/QuickActionCard";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getTranslation } from "@/lib/translations";
 import heroImage from "@/assets/hero-farm-sunrise.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,11 +28,11 @@ const Index = () => {
 
             
             <h1 className="text-5xl md:text-7xl font-bold leading-tight">
-              Fruit Vision AI
+              {getTranslation("heroTitle", language)}
             </h1>
             
             <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
-              Smart farming companion
+              {getTranslation("heroSubtitle", language)}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
@@ -39,7 +42,7 @@ const Index = () => {
                 onClick={() => navigate("/weather")}
               >
                 <Upload className="mr-2 h-5 w-5" />
-                Check Weather
+                {getTranslation("weather", language)}
               </Button>
               
               <Button 
@@ -48,7 +51,7 @@ const Index = () => {
                 className="text-lg px-8 py-6 bg-white/95 hover:bg-white text-foreground border-0 shadow-xl"
                 onClick={() => navigate("/dashboard")}
               >
-                View Dashboard
+                {getTranslation("dashboard", language)}
               </Button>
             </div>
           </div>
@@ -86,10 +89,10 @@ const Index = () => {
       <section className="container px-4 py-16">
         <div className="max-w-4xl mx-auto text-center space-y-4 mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Complete Farming Assistant
+            {getTranslation("features", language)}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Everything you need to grow healthy crops and increase your farm's productivity
+            {getTranslation("heroSubtitle", language)}
           </p>
         </div>
 
