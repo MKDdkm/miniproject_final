@@ -11,14 +11,38 @@ const DiseaseDetection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageLoading(true);
+      setApiError(null);
+      
+      // Check file size (max 5MB for mobile compatibility)
+      if (file.size > 5 * 1024 * 1024) {
+        setApiError('Image too large. Please use an image smaller than 5MB.');
+        setImageLoading(false);
+        return;
+      }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        setApiError('Please select a valid image file.');
+        setImageLoading(false);
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
         setResult(null);
+        setImageLoading(false);
+      };
+      reader.onerror = () => {
+        setApiError('Error reading image. Please try again.');
+        setImageLoading(false);
       };
       reader.readAsDataURL(file);
     }
@@ -28,6 +52,7 @@ const DiseaseDetection = () => {
     if (!selectedImage) return;
 
     setAnalyzing(true);
+    setApiError(null);
     
     try {
       let result = null;
@@ -40,6 +65,11 @@ const DiseaseDetection = () => {
         const imageData = selectedImage.split(',')[1]; // Remove data:image/jpeg;base64, prefix
         console.log('Image data length:', imageData.length);
         
+        // Check if image is too large for mobile/API
+        if (imageData.length > 4 * 1024 * 1024) { // 4MB base64 limit
+          throw new Error('Image too large for analysis. Please use a smaller image.');
+        }
+        
         const requestBody = {
           api_key: 'jpUBGThRukPDggdBe9hq',
           inputs: {
@@ -47,7 +77,11 @@ const DiseaseDetection = () => {
           }
         };
         
-        console.log('Request body:', JSON.stringify(requestBody, null, 2));
+        console.log('Request body size:', JSON.stringify(requestBody).length);
+        
+        // Add timeout for mobile networks
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
         
         // Use your actual Roboflow workflow endpoint
         const response = await fetch('https://serverless.roboflow.com/mourya-fayhi/workflows/detect-count-and-visualize-11', {
@@ -55,8 +89,11 @@ const DiseaseDetection = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify(requestBody),
+          signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           result = await response.json();
@@ -77,6 +114,15 @@ const DiseaseDetection = () => {
         }
       } catch (apiError) {
         console.warn('Roboflow workflow API failed:', apiError);
+        
+        // Handle specific errors
+        if (apiError.name === 'AbortError') {
+          setApiError('Request timeout. Please check your internet connection and try again.');
+        } else if (apiError.message.includes('Image too large')) {
+          setApiError(apiError.message);
+        } else {
+          setApiError('API unavailable. Using demo mode for testing.');
+        }
         
         // Fallback to realistic mock detection
         usingMockData = true;
