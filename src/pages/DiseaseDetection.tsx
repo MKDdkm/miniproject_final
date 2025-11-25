@@ -83,8 +83,8 @@ const DiseaseDetection = () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
         
-        // Use your actual Roboflow workflow endpoint
-        const response = await fetch('https://serverless.roboflow.com/mourya-fayhi/workflows/detect-count-and-visualize-11', {
+        // Use your updated Roboflow workflow endpoint
+        const response = await fetch('https://serverless.roboflow.com/mourya-fayhi/workflows/detect-count-and-visualize-13', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -143,47 +143,56 @@ const DiseaseDetection = () => {
       }
       console.log('Roboflow Workflow Response:', JSON.stringify(result, null, 2));
       
-      // Process the Roboflow workflow response
+      // Process the enhanced Roboflow workflow response (v13)
       let predictions = [];
       
-      // Handle different Roboflow API response structures
-      if (result.predictions && result.predictions.predictions && Array.isArray(result.predictions.predictions)) {
-        // Direct model API format: predictions.predictions[array]
-        predictions = result.predictions.predictions;
-        console.log('Found direct model predictions:', predictions);
+      console.log('Processing workflow v13 response structure...');
+      
+      // Handle enhanced workflow API response structures
+      if (result.predictions && Array.isArray(result.predictions)) {
+        // Simple predictions array format
+        predictions = result.predictions;
+        console.log('Found simple predictions array:', predictions);
       } else if (result.outputs && Array.isArray(result.outputs)) {
-        // Workflow API format: outputs[0].predictions.predictions[array] or outputs[0][key].predictions[array]
-        for (const output of result.outputs) {
-          console.log('Checking output:', output);
+        // Enhanced workflow format: outputs[i] with various structures
+        for (let i = 0; i < result.outputs.length; i++) {
+          const output = result.outputs[i];
+          console.log(`Checking output ${i}:`, output);
           
-          // Check if output has predictions directly
-          if (output.predictions && output.predictions.predictions && Array.isArray(output.predictions.predictions)) {
-            predictions = output.predictions.predictions;
-            console.log('Found workflow predictions (nested):', predictions);
-            break;
-          }
-          
-          // Check if output has direct predictions array
+          // Pattern 1: Direct predictions array in output
           if (output.predictions && Array.isArray(output.predictions)) {
             predictions = output.predictions;
-            console.log('Found workflow predictions (direct):', predictions);
+            console.log(`Found predictions in output ${i} (direct):`, predictions);
             break;
           }
           
-          // Check if output is an object with prediction keys
-          if (typeof output === 'object') {
-            Object.keys(output).forEach(key => {
-              const outputData = output[key];
-              if (outputData && outputData.predictions) {
-                if (Array.isArray(outputData.predictions)) {
-                  predictions = outputData.predictions;
-                  console.log(`Found predictions in output key '${key}':`, predictions);
-                } else if (outputData.predictions.predictions && Array.isArray(outputData.predictions.predictions)) {
-                  predictions = outputData.predictions.predictions;
-                  console.log(`Found nested predictions in output key '${key}':`, predictions);
+          // Pattern 2: Nested predictions structure
+          if (output.predictions && output.predictions.predictions && Array.isArray(output.predictions.predictions)) {
+            predictions = output.predictions.predictions;
+            console.log(`Found predictions in output ${i} (nested):`, predictions);
+            break;
+          }
+          
+          // Pattern 3: Check all properties for prediction arrays
+          if (typeof output === 'object' && output !== null) {
+            for (const [key, value] of Object.entries(output)) {
+              if (value && typeof value === 'object') {
+                const valueObj = value as any;
+                // Check if this property contains predictions
+                if (valueObj.predictions && Array.isArray(valueObj.predictions)) {
+                  predictions = valueObj.predictions;
+                  console.log(`Found predictions in output ${i}, key '${key}':`, predictions);
+                  break;
+                }
+                // Check for nested predictions
+                if (valueObj.predictions && valueObj.predictions.predictions && Array.isArray(valueObj.predictions.predictions)) {
+                  predictions = valueObj.predictions.predictions;
+                  console.log(`Found nested predictions in output ${i}, key '${key}':`, predictions);
+                  break;
                 }
               }
-            });
+            }
+            if (predictions.length > 0) break;
           }
         }
       } else if (result.outputs) {
