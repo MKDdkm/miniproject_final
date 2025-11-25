@@ -3,7 +3,6 @@ import { Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import fruitImage from "@/assets/fruit-detection.jpg";
@@ -367,180 +366,6 @@ const DiseaseDetection = () => {
     setAnalyzing(false);
   };
 
-  const analyzeAppleImage = async () => {
-    if (!selectedImage) {
-      toast.error('Please select an image first');
-      return;
-    }
-
-    setAnalyzing(true);
-    setResult(null);
-
-    try {
-      console.log('Starting Apple Disease Detection...');
-      
-      // Convert image to base64
-      const base64Image = selectedImage.split(',')[1];
-      
-      const response = await fetch('https://serverless.roboflow.com/mourya-fayhi/workflows/detect-count-and-visualize-12', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          api_key: 'jpUBGThRukPDggdBe9hq',
-          inputs: {
-            "image": {"type": "base64", "value": base64Image}
-          }
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('Apple Detection Response:', result);
-
-      // Parse Apple detection results
-      let predictions = [];
-      
-      if (result.outputs && Array.isArray(result.outputs)) {
-        for (const output of result.outputs) {
-          if (output.predictions && Array.isArray(output.predictions)) {
-            predictions = output.predictions;
-            break;
-          }
-        }
-      }
-
-      console.log('Apple predictions:', predictions);
-
-      if (predictions && predictions.length > 0) {
-        const bestPrediction = predictions.reduce((prev, current) => {
-          const prevConf = prev.confidence || prev.score || 0;
-          const currConf = current.confidence || current.score || 0;
-          return (prevConf > currConf) ? prev : current;
-        });
-
-        // Apple-specific disease mapping
-        const getAppleDiseaseInfo = (className) => {
-          const appleDiseaseMap = {
-            'apple_scab': {
-              name: 'Apple Scab',
-              treatment: [
-                "Remove and destroy infected leaves immediately",
-                "Apply fungicide spray every 10-14 days", 
-                "Ensure proper air circulation around trees",
-                "Avoid overhead watering to reduce leaf wetness"
-              ]
-            },
-            'apple_healthy': {
-              name: 'Healthy Apple',
-              treatment: [
-                "Your apple appears healthy!",
-                "Continue regular monitoring",
-                "Maintain proper watering schedule",
-                "Ensure adequate nutrition for the tree"
-              ]
-            },
-            'apple_black_rot': {
-              name: 'Apple Black Rot',
-              treatment: [
-                "Prune infected branches immediately",
-                "Apply copper-based fungicide",
-                "Remove infected fruits from tree and ground",
-                "Improve air circulation around the tree"
-              ]
-            },
-            'apple_cedar_rust': {
-              name: 'Apple Cedar Rust',
-              treatment: [
-                "Remove nearby cedar trees if possible",
-                "Apply preventive fungicide sprays in spring",
-                "Remove infected leaves and fruits",
-                "Plant resistant apple varieties"
-              ]
-            }
-          };
-          
-          return appleDiseaseMap[className] || {
-            name: className.replace('_', ' ').toUpperCase(),
-            treatment: [
-              "Consult with a local agricultural expert",
-              "Remove affected plant parts",
-              "Apply appropriate treatments as recommended",
-              "Monitor the plant closely for changes"
-            ]
-          };
-        };
-
-        const diseaseInfo = getAppleDiseaseInfo(bestPrediction.class);
-        const confidence = Math.round((bestPrediction.confidence || bestPrediction.score || 0) * 100);
-
-        const detectionResult = {
-          disease: diseaseInfo.name,
-          confidence: confidence,
-          severity: confidence > 80 ? "High" : confidence > 50 ? "Medium" : "Low",
-          treatment: diseaseInfo.treatment,
-          prevention: [
-            "Regular inspection of apple trees",
-            "Maintain proper spacing for air circulation", 
-            "Use drip irrigation instead of overhead watering",
-            "Remove fallen leaves and debris regularly",
-            "Apply preventive treatments during growing season"
-          ],
-          isAppleDetection: true
-        };
-
-        setResult(detectionResult);
-        toast.success('Apple analysis completed!');
-        
-      } else {
-        setResult({
-          disease: "No Apple Disease Detected",
-          confidence: 0,
-          severity: "Please Upload Clear Apple Image",
-          treatment: [
-            "Upload a clear image of an apple or apple leaf",
-            "Ensure the apple/leaf is well-lit and centered",
-            "Focus on any diseased areas if visible",
-            "Try a closer shot of the affected area"
-          ],
-          prevention: [
-            "Use high-quality apple images",
-            "Ensure proper lighting",
-            "Focus on the fruit or leaves clearly",
-            "Try different angles if needed"
-          ]
-        });
-        toast.warning('No apple diseases detected in image');
-      }
-    } catch (error) {
-      console.error('Apple analysis error:', error);
-      setResult({
-        disease: "Apple Analysis Error",
-        severity: "Unable to Process",
-        confidence: 0,
-        treatment: [
-          "Unable to analyze the apple image",
-          "Please try again with a clearer image",
-          "Check your internet connection",
-          "Contact support if issues persist"
-        ],
-        prevention: [
-          "Check your internet connection",
-          "Try uploading a different apple image",
-          "Ensure the image format is supported",
-          "Contact support if issues persist"
-        ]
-      });
-      toast.error('Failed to analyze apple image');
-    }
-    
-    setAnalyzing(false);
-  };
-
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
       case "low": return "text-success";
@@ -603,25 +428,14 @@ const DiseaseDetection = () => {
                 </div>
 
                 {selectedImage && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Button 
-                      onClick={analyzeImage} 
-                      disabled={analyzing}
-                      size="lg"
-                      className="w-full"
-                      variant="default"
-                    >
-                      {analyzing ? "Analyzing..." : "🍎 General Fruit Detection"}
-                    </Button>
-                    <Button 
-                      onClick={analyzeAppleImage} 
-                      disabled={analyzing}
-                      size="lg"
-                      className="w-full bg-red-600 hover:bg-red-700"
-                    >
-                      {analyzing ? "Analyzing..." : "🍏 Apple Disease Detection"}
-                    </Button>
-                  </div>
+                  <Button 
+                    onClick={analyzeImage} 
+                    disabled={analyzing}
+                    size="lg"
+                    className="w-full"
+                  >
+                    {analyzing ? "Analyzing..." : "Analyze Image"}
+                  </Button>
                 )}
               </div>
             </CardContent>
