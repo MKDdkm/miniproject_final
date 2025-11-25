@@ -1,0 +1,7 @@
+# Redirects for SPA routing
+/detection /index.html 200
+/dashboard /index.html 200
+/prices /index.html 200
+/schemes /index.html 200
+/services /index.html 200
+/* /index.html 200

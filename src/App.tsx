@@ -17,6 +17,18 @@ import PestAlerts from "./pages/PestAlerts";
 import SowingCalendar from "./pages/SowingCalendar";
 import OrganicFarmingTips from './pages/OrganicFarmingTips';
 
+// Register service worker for better mobile performance and routing
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
 
 const queryClient = new QueryClient();
 
